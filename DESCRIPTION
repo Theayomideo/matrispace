@@ -56,6 +56,8 @@ Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown
+Remotes:
+    Theayomideo/MERINGUE
 LazyData: true
 VignetteBuilder: knitr
 Config/testthat/edition: 3
