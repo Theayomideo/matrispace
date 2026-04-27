@@ -1,0 +1,48 @@
+url: https://Theayomideo.github.io/matrispace/
+
+template:
+  bootstrap: 5
+
+reference:
+  - title: "Preprocessing"
+    contents:
+      - prepare_object
+      - convert_spe_to_seurat
+      - translate_signatures
+  - title: "Matrisome and ECM niches"
+    contents:
+      - score_matrisome
+      - annotate_ecm_niches
+      - compute_expression_metrics
+  - title: "Differential expression"
+    contents:
+      - find_ecm_markers
+      - find_all_ecm_markers
+      - find_spatially_corrected_ecm_markers
+      - find_ecm_de_samples
+  - title: "Spatial statistics"
+    contents:
+      - compute_lisa
+      - compute_morans_i
+  - title: "Ligand-receptor"
+    contents:
+      - score_lr_activity
+      - find_lr_enrichment
+      - aggregate_lr_axes
+  - title: "Visualization"
+    contents:
+      - plot_spatial_feature
+      - plot_matrisome
+      - plot_spatial_blend
+      - plot_lisa
+      - palette_ecm
+  - title: "Reference data"
+    contents:
+      - matrisome_db
+      - matrisome_signatures
+      - ecm_signatures
+      - lr_database
+      - ecm_markers
+  - title: "Deprecated"
+    contents:
+      - annotate_ecm_domains

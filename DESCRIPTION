@@ -1,0 +1,61 @@
+Package: matrispace
+Title: Identification and Visualization of Spatially-Resolved ECM Gene Expression Patterns
+Version: 0.1.0
+Authors@R: c(
+    person("Ayomide", "Oshinjo", role = "aut"),
+    person("Daiqing", "Chen", role = "aut"),
+    person("Petar", "Petrov", role = "aut"),
+    person("Valerio", "Izzi", role = c("aut", "cre"),
+           email = "matrisomeproject@gmail.com",
+           comment = c(ORCID = "0000-0002-4269-2699")),
+    person("Alexandra", "Naba", role = "aut",
+           comment = c(ORCID = "0000-0002-0454-7007")),
+    person("University of Oulu", role = "cph"),
+    person("Boston University", role = "cph")
+    )
+Description: R package companion to MatriSpace for identification and
+    visualization of spatially-resolved extracellular matrix gene expression
+    patterns. Provides the core workflows used in the MatriSpace ecosystem,
+    including matrisome scoring, ECM niche annotation, differential expression,
+    spatial statistics, ligand-receptor activity scoring, and visualization for
+    Seurat and SpatialExperiment objects.
+License: GPL (>= 3) + file LICENSE
+URL: https://github.com/Theayomideo/matrispace, http://matrinet.shinyapps.io/matrispace
+BugReports: https://github.com/Theayomideo/matrispace/issues
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Depends:
+    R (>= 4.1.0)
+Imports:
+    methods,
+    stats,
+    grDevices,
+    dplyr,
+    ggplot2,
+    Matrix,
+    Seurat (>= 4.0.0),
+    SeuratObject,
+    UCell,
+    HGNChelper,
+    scales,
+    patchwork,
+    RColorBrewer
+Suggests:
+    plotly,
+    SpatialExperiment,
+    SingleCellExperiment,
+    SummarizedExperiment,
+    DESeq2,
+    MERINGUE,
+    openxlsx,
+    spaMM,
+    viridis,
+    scCustomize,
+    ggpubr,
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+LazyData: true
+VignetteBuilder: knitr
+Config/testthat/edition: 3

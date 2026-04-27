@@ -1,0 +1,148 @@
+---
+title: "Getting started with matrispace"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with matrispace}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 8,
+  fig.height = 6,
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+# Overview
+
+`matrispace` is the R package companion to MatriSpace. It mirrors the same
+workflow structure used in the web app: data input, matrisome profiling, and
+feature analysis.
+
+The package is designed for local, reproducible analysis of spatial
+transcriptomics data with a focus on extracellular matrix biology.
+
+```{r load-package}
+library(matrispace)
+library(Seurat)
+library(ggplot2)
+```
+
+# Load data
+
+You can start from a Seurat object or convert a SpatialExperiment object with
+`convert_spe_to_seurat()`.
+
+```{r load-data, eval=FALSE}
+seurat_obj <- readRDS("path/to/your/spatial_object.rds")
+```
+
+For examples and testing, the package also ships with a small Seurat object:
+
+```{r load-test-data, eval=FALSE}
+test_path <- system.file("testdata", "test_seurat.rds", package = "matrispace")
+seurat_obj <- readRDS(test_path)
+```
+
+# Prepare the object
+
+`prepare_object()` runs the standard MatriSpace preprocessing steps:
+
+- gene/signature translation
+- matrisome scoring
+- ECM niche classification
+- ECM niche scoring
+
+```{r preprocess, eval=FALSE}
+seurat_obj <- prepare_object(seurat_obj, verbose = TRUE)
+```
+
+# Matrisome profiling
+
+The main profiling functions mirror the MatriSpace app workflow.
+
+```{r profiling, eval=FALSE}
+seurat_obj <- score_matrisome(seurat_obj)
+seurat_obj <- annotate_ecm_niches(seurat_obj)
+seurat_obj <- score_lr_activity(seurat_obj)
+```
+
+Built-in reference objects are available directly:
+
+```{r reference-data}
+data(matrisome_db)
+data(matrisome_signatures)
+data(ecm_signatures)
+data(lr_database)
+
+nrow(matrisome_db)
+length(matrisome_signatures)
+names(ecm_signatures)
+```
+
+# Visualization
+
+You can generate the same style of ECM-focused spatial views used throughout
+MatriSpace.
+
+```{r plots, eval=FALSE}
+plot_spatial_feature(seurat_obj, "Collagens")
+plot_spatial_blend(seurat_obj, c("COL1A1", "FN1"))
+```
+
+# Differential expression
+
+The package now exposes two complementary differential-expression workflows.
+
+## Within-sample spatial correction
+
+Use `find_spatially_corrected_ecm_markers()` when comparing niches or
+compartments within a tissue section and spatial autocorrelation should be
+modeled explicitly.
+
+```{r spatial-de, eval=FALSE}
+spatial_de <- find_spatially_corrected_ecm_markers(
+  seurat_obj,
+  group.by = "CompositionCluster_CC",
+  ident.1 = "CC1",
+  ident.2 = "CC3"
+)
+```
+
+## Cross-sample pseudobulk testing
+
+Use `find_ecm_de_samples()` with `pseudobulk = TRUE` when comparing conditions
+across biological samples.
+
+```{r pseudobulk-de, eval=FALSE}
+pseudobulk_de <- find_ecm_de_samples(
+  seurat_obj,
+  condition.col = "condition",
+  condition.1 = "Inflamed",
+  condition.2 = "Non-inflamed",
+  pseudobulk = TRUE,
+  sample.col = "sample_id",
+  cluster.col = "CompositionCluster_CC",
+  blocking.col = "patient_id"
+)
+```
+
+# Spatial statistics
+
+`matrispace` also provides direct access to local and global spatial analyses.
+
+```{r spatial-stats, eval=FALSE}
+lisa_df <- compute_lisa(seurat_obj, "COL1A1", "gene", "FN1", "gene")
+morans <- compute_morans_i(seurat_obj)
+```
+
+# Related resources
+
+- [MatriSpace web app](http://matrinet.shinyapps.io/matrispace)
+- [MatriSpace app repository](https://github.com/Theayomideo/matrispace-app)
+- [The Matrisome Project](https://sites.google.com/uic.edu/matrisome/home)

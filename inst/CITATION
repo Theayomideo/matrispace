@@ -1,0 +1,16 @@
+citHeader("To cite the matrispace package, please use:")
+
+bibentry(
+  bibtype  = "Manual",
+  title    = "matrispace: Identification and Visualization of Spatially-Resolved ECM Gene Expression Patterns",
+  author   = c(
+    person("Ayomide", "Oshinjo"),
+    person("Daiqing", "Chen"),
+    person("Petar", "Petrov"),
+    person("Valerio", "Izzi"),
+    person("Alexandra", "Naba")
+  ),
+  year     = format(Sys.Date(), "%Y"),
+  note     = sprintf("R package version %s", utils::packageVersion("matrispace")),
+  url      = "https://github.com/Theayomideo/matrispace"
+)

@@ -1,0 +1,35 @@
+# R session files
+.Rhistory
+.Rapp.history
+.RData
+.Ruserdata
+
+# RStudio project files
+.Rproj.user/
+
+# R package build artifacts
+*.tar.gz
+*.Rcheck/
+
+# Compiled code
+*.o
+*.so
+*.dll
+
+# Documentation artifacts
+docs/
+inst/doc/
+
+# Vignette cache
+vignettes/*.html
+vignettes/*.pdf
+vignettes/*_cache/
+vignettes/*_files/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

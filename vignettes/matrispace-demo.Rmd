@@ -1,0 +1,339 @@
+---
+title: "MatriSpace: Spatially-Resolved ECM Gene Expression Patterns"
+author: "Oshinjo A, Chen D, Petrov P, Izzi V, Naba A"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 2
+    theme: flatly
+    highlight: tango
+    fig_width: 10
+    fig_height: 6
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 10,
+  fig.height = 6,
+  warning = FALSE,
+  message = FALSE,
+  cache = TRUE
+)
+```
+
+```{r load-packages, include=FALSE}
+library(matrispace)
+library(Seurat)
+library(ggplot2)
+library(patchwork)
+library(dplyr)
+library(tidyr)
+```
+
+```{r load-data, include=FALSE}
+# Load test Seurat object
+test_paths <- c(
+  system.file("testdata", "test_seurat.rds", package = "matrispace"),
+  "../inst/testdata/test_seurat.rds",
+  "inst/testdata/test_seurat.rds"
+)
+test_path <- NULL
+for (p in test_paths) {
+  if (file.exists(p) && p != "") {
+    test_path <- p
+    break
+  }
+}
+seurat_obj <- readRDS(test_path)
+seurat_obj <- UpdateSeuratObject(seurat_obj)
+seurat_obj <- prepare_object(seurat_obj, verbose = FALSE)
+```
+
+# Overview
+
+**matrispace** analyzes the extracellular matrix (matrisome) in spatial transcriptomics data. This demo shows:
+
+- ECM niche classification
+- Matrisome expression mapping
+- Spatial co-localization (LISA)
+- Ligand-receptor communication analysis
+
+**Test dataset:** Spatial transcriptomics sample with matrisome annotation
+
+---
+
+# ECM Niche Annotation
+
+Each spot is classified into an ECM niche (e.g. Interstitial, Basement
+membrane) using ScType.
+
+```{r ecm-distribution}
+table(seurat_obj$ecm_niche)
+```
+
+```{r ecm-spatial, fig.height=5}
+ecm_colors <- palette_ecm(unique(seurat_obj$ecm_niche))
+coords <- GetTissueCoordinates(seurat_obj)
+plot_df <- data.frame(
+  imagecol = coords$imagecol,
+  imagerow = coords$imagerow,
+  niche = seurat_obj$ecm_niche
+)
+
+ggplot(plot_df, aes(x = imagecol, y = imagerow, color = niche)) +
+  geom_point(size = 1.3) +
+  scale_color_manual(values = ecm_colors, name = "ECM niche") +
+  scale_y_reverse() +
+  coord_fixed() +
+  theme_void() +
+  labs(title = "ECM niche classification") +
+  theme(plot.title = element_text(hjust = 0.5), legend.position = "right")
+```
+
+---
+
+# Matrisome Expression
+
+UCell scores for matrisome categories visualized spatially.
+
+```{r matrisome-spatial, fig.height=10}
+p1 <- plot_spatial_feature(seurat_obj, "Collagens", pt.size = 1.3)
+p2 <- plot_spatial_feature(seurat_obj, "ECM Glycoproteins", pt.size = 1.3)
+p3 <- plot_spatial_feature(seurat_obj, "ECM Regulators", pt.size = 1.3)
+p4 <- plot_spatial_feature(seurat_obj, "ECM-affiliated Proteins", pt.size = 1.3)
+
+(p1 | p2) / (p3 | p4)
+```
+
+## Dual Normalization View
+
+Robust-normalized and log-scaled scores side-by-side:
+
+```{r matrisome-dual, fig.height=5}
+seurat_obj$collagens_robust_score <- seurat_obj@meta.data[["Collagens"]]
+seurat_obj$collagens_log_scaled_score <- log1p(seurat_obj@meta.data[["Collagens"]])
+
+plot_matrisome(seurat_obj, "Collagens", "collagens", pt.size = 1.3)
+```
+
+---
+
+# Spatial Co-localization (LISA)
+
+LISA (Local Indicators of Spatial Association) identifies where two features cluster together spatially.
+
+```{r lisa-compute}
+# Analyze COL4A1 vs COL1A1 spatial relationship
+lisa_results <- compute_lisa(
+  seurat_obj,
+  feature1 = "COL4A1", feature1_type = "gene",
+  feature2 = "COL1A1", feature2_type = "gene"
+)
+lisa_results$id <- seurat_obj$ecm_niche
+
+table(lisa_results$LISA)
+```
+
+```{r lisa-plot, fig.width=12, fig.height=6}
+plot_lisa(
+  lisa_results,
+  ann_col = "id",
+  f1_name = "COL4A1",
+  f2_name = "COL1A1"
+)
+```
+
+**Interpretation:**
+
+| Pattern | Meaning |
+|---------|---------|
+| High-High (red) | COL4A1 high, surrounded by COL1A1 high |
+| High-Low (orange) | COL4A1 high, surrounded by COL1A1 low |
+| Low-High (purple) | COL4A1 low, surrounded by COL1A1 high |
+| Low-Low (blue) | Both low |
+
+---
+
+# Two-Feature Blend
+
+Visualize co-expression with a 2D color gradient:
+
+```{r blend-plot, fig.width=12, fig.height=4}
+plot_spatial_blend(
+  seurat_obj,
+  features = c("COL4A1", "COL1A1"),
+  feature1_name = "COL4A1",
+  feature2_name = "COL1A1"
+)
+```
+
+---
+
+# Ligand-Receptor Analysis
+
+Spatial L-R scoring measures paracrine signaling: ligand expression in neighbors × receptor expression in spot.
+
+```{r lr-score, cache=TRUE}
+seurat_obj <- score_lr_activity(seurat_obj, verbose = FALSE)
+cat("L-R interactions scored:", nrow(seurat_obj[["LRACTIVITY"]]))
+```
+
+## Enrichment by ECM Niche
+
+```{r lr-enrichment}
+lr_stats <- find_lr_enrichment(seurat_obj, group_by = "ecm_niche")
+```
+
+### Top Interactions per Niche
+
+```{r lr-top}
+get_top <- function(cluster, n = 5) {
+  lr_stats %>%
+    filter(cluster == !!cluster) %>%
+    slice_max(avg_log2FC, n = n) %>%
+    select(feature, avg_log2FC, perc_difference)
+}
+```
+
+**Interstitial ECM niche:**
+```{r}
+get_top("Interstitial_ECM")
+```
+
+**Basement membrane ECM niche:**
+```{r}
+get_top("Basement_ECM")
+```
+
+## Heatmap
+
+```{r lr-heatmap, fig.height=7}
+top_lr <- lr_stats %>%
+  group_by(cluster) %>%
+  slice_max(avg_log2FC, n = 8) %>%
+  ungroup()
+
+ggplot(top_lr, aes(x = cluster, y = reorder(feature, avg_log2FC), fill = avg_log2FC)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(low = "#2166ac", mid = "white", high = "#b2182b", midpoint = 0) +
+  theme_minimal(base_size = 11) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text.y = element_text(size = 8),
+    panel.grid = element_blank()
+  ) +
+  labs(x = NULL, y = NULL, fill = "log2FC",
+       title = "Top Enriched L-R Interactions")
+```
+
+---
+
+# Differential ECM Expression
+
+Identify ECM genes differentially expressed between ECM niches.
+
+## Markers for one niche
+
+Compare Interstitial ECM vs all other niches:
+
+```{r de-single}
+interstitial_markers <- find_ecm_markers(
+  seurat_obj,
+  ident.1 = "Interstitial_ECM",
+  group.by = "ecm_niche",
+  verbose = FALSE
+)
+
+head(interstitial_markers[, c("gene", "avg_log2FC", "p_val_adj", "subcategory")])
+```
+
+## All niche markers
+
+Find ECM markers for each niche simultaneously:
+
+```{r de-all}
+all_markers <- find_all_ecm_markers(
+  seurat_obj,
+  group.by = "ecm_niche",
+  verbose = FALSE
+)
+
+# Top 3 markers per niche
+all_markers %>%
+  group_by(cluster) %>%
+  slice_max(avg_log2FC, n = 3) %>%
+  select(cluster, gene, avg_log2FC, subcategory)
+```
+
+## Category-Specific Analysis
+
+Filter to specific matrisome categories (e.g., collagens only):
+
+```{r de-category}
+collagen_markers <- find_ecm_markers(
+  seurat_obj,
+  ident.1 = "Basement_ECM",
+  group.by = "ecm_niche",
+  categories = "Collagens",
+  verbose = FALSE
+)
+collagen_markers[, c("gene", "avg_log2FC", "p_val_adj")]
+```
+
+## Visualization
+
+```{r de-heatmap, fig.height=6}
+top_de <- all_markers %>%
+  filter(p_val_adj < 0.05) %>%
+  group_by(cluster) %>%
+  slice_max(avg_log2FC, n = 6) %>%
+  ungroup()
+
+ggplot(top_de, aes(x = cluster, y = reorder(gene, avg_log2FC), fill = avg_log2FC)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(low = "#2166ac", mid = "white", high = "#b2182b", midpoint = 0) +
+  theme_minimal(base_size = 11) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.grid = element_blank()
+  ) +
+  labs(x = NULL, y = NULL, fill = "log2FC", title = "Top ECM markers by niche")
+```
+
+---
+
+# Summary
+
+| Function | What it does |
+|----------|--------------|
+| `annotate_ecm_niches()` | Classify spots into ECM niches |
+| `score_matrisome()` | Calculate matrisome category scores |
+| `plot_spatial_feature()` | Map any feature spatially |
+| `compute_lisa()` | Spatial co-localization statistics |
+| `plot_lisa()` | Visualize LISA clusters |
+| `plot_spatial_blend()` | Two-feature overlay |
+| `score_lr_activity()` | Ligand-receptor spatial scoring |
+| `find_lr_enrichment()` | L-R enrichment per group |
+| `find_ecm_markers()` | DE between two groups |
+| `find_all_ecm_markers()` | DE for all clusters |
+
+---
+
+# Session Info
+
+```{r session-info}
+si <- sessionInfo()
+cat("R version:", si$R.version$version.string, "\n")
+cat("Platform:", si$platform, "\n\n")
+cat("Key packages:\n")
+pkgs <- c("matrispace", "Seurat", "SeuratObject", "ggplot2", "UCell")
+for (pkg in pkgs) {
+  if (pkg %in% names(si$otherPkgs)) {
+    cat(" ", pkg, ":", as.character(packageVersion(pkg)), "\n")
+  }
+}
+```

@@ -1,0 +1,14 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^LICENSE\.md$
+^README\.Rmd$
+^data-raw$
+^\.github$
+^inst/testdata$
+^vignettes/.*_cache$
+^vignettes/.*_files$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.Rhistory$
+^CRAN-SUBMISSION$
