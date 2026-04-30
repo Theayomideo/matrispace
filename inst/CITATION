@@ -1,6 +1,22 @@
 citHeader("To cite the matrispace package, please use:")
 
 bibentry(
+  bibtype  = "Article",
+  title    = "MatriSpace: Identification and visualization of spatially-resolved ECM gene expression patterns in health and disease",
+  author   = c(
+    person("Ayomide", "Oshinjo"),
+    person("Daiqing", "Chen"),
+    person("Petar", "Petrov"),
+    person("Valerio", "Izzi"),
+    person("Alexandra", "Naba")
+  ),
+  journal  = "bioRxiv",
+  year     = "2026",
+  doi      = "10.64898/2026.04.26.720198",
+  url      = "https://doi.org/10.64898/2026.04.26.720198"
+)
+
+bibentry(
   bibtype  = "Manual",
   title    = "matrispace: Identification and Visualization of Spatially-Resolved ECM Gene Expression Patterns",
   author   = c(
