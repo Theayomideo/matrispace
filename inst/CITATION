@@ -10,10 +10,10 @@ bibentry(
     person("Valerio", "Izzi"),
     person("Alexandra", "Naba")
   ),
-  journal  = "bioRxiv",
+  journal  = "Journal of Cell Science",
   year     = "2026",
-  doi      = "10.64898/2026.04.26.720198",
-  url      = "https://doi.org/10.64898/2026.04.26.720198"
+  doi      = "10.1242/jcs.264998",
+  url      = "https://doi.org/10.1242/jcs.264998"
 )
 
 bibentry(

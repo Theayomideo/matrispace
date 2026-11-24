@@ -8,9 +8,9 @@
 
 R package companion to [MatriSpace](https://github.com/Theayomideo/matrispace-app) for identifying, quantifying, and interpreting spatially-resolved extracellular matrix (ECM) gene expression patterns in spatial transcriptomics data.
 
-If you use `matrispace` in your publications, please cite our preprint: **doi** [10.64898/2026.04.26.720198](https://doi.org/10.64898/2026.04.26.720198)
+If you use `matrispace` in your publications, please cite our paper: **doi** [10.1242/jcs.264998](https://doi.org/10.1242/jcs.264998)
 
-[![Badge](https://img.shields.io/badge/Manuscript-bioRxiv-red)](https://doi.org/10.64898/2026.04.26.720198)
+[![Badge](https://img.shields.io/badge/Paper-Journal_of_Cell_Science-red)](https://doi.org/10.1242/jcs.264998)
 
 The [online MatriSpace app](https://izzilab-matrispace.share.connect.posit.cloud/) provides an interactive interface over 240 curated datasets (180 cancer and 60 healthy tissue sections) and user uploads. The `matrispace` package exposes the same workflow in R for scripted analyses, custom modeling, and figure generation.
 
