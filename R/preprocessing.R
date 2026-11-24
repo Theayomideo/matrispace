@@ -273,6 +273,8 @@ prepare_object <- function(seurat_obj,
   if (!has_niche) {
     .message_if(verbose, "ECM niche annotation not found. Running ScType...")
     seurat_obj <- annotate_ecm_niches(seurat_obj)
+  } else if (!"ecm_niche" %in% colnames(seurat_obj@meta.data)) {
+    seurat_obj$ecm_niche <- seurat_obj$ecm_domain_annotation
   }
 
   # Step 4: Add ECM Niche Signatures
