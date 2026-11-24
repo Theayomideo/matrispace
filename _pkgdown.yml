@@ -4,6 +4,9 @@ template:
   bootstrap: 5
 
 reference:
+  - title: "Package overview"
+    contents:
+      - matrispace-package
   - title: "Preprocessing"
     contents:
       - prepare_object
@@ -36,6 +39,8 @@ reference:
       - plot_spatial_blend
       - plot_lisa
       - palette_ecm
+      - palette_annotation
+      - add_scalebar
   - title: "Reference data"
     contents:
       - matrisome_db
@@ -46,3 +51,14 @@ reference:
   - title: "Deprecated"
     contents:
       - annotate_ecm_domains
+  - title: internal
+    contents:
+      - color-palettes
+      - data
+      - differential-expression
+      - ecm-annotation
+      - matrisome
+      - matrisome-pairs
+      - plots
+      - preprocessing
+      - spatial
