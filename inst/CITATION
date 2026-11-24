@@ -27,6 +27,6 @@ bibentry(
     person("Alexandra", "Naba")
   ),
   year     = format(Sys.Date(), "%Y"),
-  note     = sprintf("R package version %s", utils::packageVersion("matrispace")),
+  note     = sprintf("R package version %s", meta$Version),
   url      = "https://github.com/Theayomideo/matrispace"
 )

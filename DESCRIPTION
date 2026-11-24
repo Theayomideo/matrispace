@@ -20,7 +20,7 @@ Description: R package companion to MatriSpace for identification and
     spatial statistics, matrisome-pair co-expression scoring, and visualization for
     Seurat and SpatialExperiment objects.
 License: GPL (>= 3) + file LICENSE
-URL: https://github.com/Theayomideo/matrispace,
+URL: https://theayomideo.github.io/matrispace/, https://github.com/Theayomideo/matrispace,
     https://github.com/izzilab/matrispace,
     https://izzilab-matrispace.share.connect.posit.cloud/
 BugReports: https://github.com/Theayomideo/matrispace/issues
