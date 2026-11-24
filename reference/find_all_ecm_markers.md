@@ -1,0 +1,92 @@
+# Find ECM markers for all clusters
+
+Identifies differentially expressed ECM genes for each cluster compared
+to all other cells. Wrapper around `find_ecm_markers` for all clusters.
+
+## Usage
+
+``` r
+find_all_ecm_markers(
+  seurat_obj,
+  group.by = NULL,
+  assay = NULL,
+  test.use = "wilcox",
+  min.pct = 0.05,
+  logfc.threshold = 0.25,
+  min.diff.pct = -Inf,
+  categories = NULL,
+  only.pos = TRUE,
+  p.adjust.method = "BH",
+  verbose = TRUE
+)
+```
+
+## Arguments
+
+- seurat_obj:
+
+  A Seurat object
+
+- group.by:
+
+  Metadata column to use for grouping. If NULL, uses active identities.
+
+- assay:
+
+  Assay to use. If NULL, auto-detects (SCT \> Spatial \> first
+  available).
+
+- test.use:
+
+  Statistical test: "wilcox" (default), "MAST", "DESeq2", "LR", "t"
+
+- min.pct:
+
+  Minimum fraction of cells expressing the gene in either group
+  (default: 0.05)
+
+- logfc.threshold:
+
+  Minimum log2 fold change threshold (default: 0.25)
+
+- min.diff.pct:
+
+  Minimum difference in expression percentage between groups
+
+- categories:
+
+  Matrisome categories to include. Can be divisions ("Core matrisome")
+  or subcategories ("Collagens"). If NULL, uses all ECM genes.
+
+- only.pos:
+
+  Only return genes with positive log2FC (upregulated in ident.1)
+
+- p.adjust.method:
+
+  Method for p-value adjustment (default: "BH")
+
+- verbose:
+
+  Print progress messages
+
+## Value
+
+Data frame with columns from `find_ecm_markers` plus:
+
+- cluster:
+
+  Cluster/group identifier
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+# Find ECM markers for all clusters
+all_markers <- find_all_ecm_markers(seurat_obj, group.by = "seurat_clusters")
+
+# Filter to core matrisome only
+core_markers <- find_all_ecm_markers(seurat_obj,
+                                      categories = "Core matrisome")
+} # }
+```

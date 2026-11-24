@@ -1,0 +1,212 @@
+# matrispace
+
+R package companion to
+[MatriSpace](https://github.com/Theayomideo/matrispace-app) for
+identifying, quantifying, and interpreting spatially-resolved
+extracellular matrix (ECM) gene expression patterns in spatial
+transcriptomics data.
+
+If you use `matrispace` in your publications, please cite our paper:
+**doi** [10.1242/jcs.264998](https://doi.org/10.1242/jcs.264998)
+
+[![Badge](https://img.shields.io/badge/Paper-Journal_of_Cell_Science-red)](https://doi.org/10.1242/jcs.264998)
+
+The [online MatriSpace
+app](https://izzilab-matrispace.share.connect.posit.cloud/) provides an
+interactive interface over 240 curated datasets (180 cancer and 60
+healthy tissue sections) and user uploads. The `matrispace` package
+exposes the same workflow in R for scripted analyses, custom modeling,
+and figure generation.
+
+## Motivation
+
+The extracellular matrix is a spatially organized signaling environment
+that shapes tissue architecture, niche identity, inflammation, fibrosis,
+and tumor progression. Spatial transcriptomics enables the study of ECM
+gene expression in its native tissue context, but most general-purpose
+workflows are not built around matrisome organization or ECM niches.
+`matrispace` brings the MatriSpace analytical framework into R so that
+matrisome-centered analyses can be reproduced and extended in local
+pipelines.
+
+## Workflow
+
+The package follows the same three stages as the MatriSpace web
+application: **data input**, **matrisome profiling**, and **feature
+analysis**.
+
+### Data input
+
+Accepts `Seurat` objects directly and converts `SpatialExperiment`
+objects via
+[`convert_spe_to_seurat()`](https://Theayomideo.github.io/matrispace/reference/convert_spe_to_seurat.md).
+[`prepare_object()`](https://Theayomideo.github.io/matrispace/reference/prepare_object.md)
+standardizes gene symbols, computes matrisome signatures, and classifies
+each spot into an ECM niche.
+
+### Matrisome profiling
+
+- [`score_matrisome()`](https://Theayomideo.github.io/matrispace/reference/score_matrisome.md)
+  — UCell scores for the six matrisome categories and curated
+  subfamilies (Basement Membrane, Laminins, Matricellular, Mucins,
+  Peri-vascular ECM).
+- [`annotate_ecm_niches()`](https://Theayomideo.github.io/matrispace/reference/annotate_ecm_niches.md)
+  — ECM niche classification (e.g. Interstitial, Basement membrane),
+  with continuous per-spot niche scores.
+- [`score_matrisome_pair_coexpression()`](https://Theayomideo.github.io/matrispace/reference/score_matrisome_pair_coexpression.md)
+  /
+  [`find_matrisome_pair_enrichment()`](https://Theayomideo.github.io/matrispace/reference/find_matrisome_pair_enrichment.md)
+  — spatial co-expression of unique heterotypic MatriComDB pairs in
+  which at least one member is a matrisome gene.
+
+### Feature analysis
+
+- Spatial visualization:
+  [`plot_spatial_feature()`](https://Theayomideo.github.io/matrispace/reference/plot_spatial_feature.md),
+  [`plot_matrisome()`](https://Theayomideo.github.io/matrispace/reference/plot_matrisome.md),
+  [`plot_spatial_blend()`](https://Theayomideo.github.io/matrispace/reference/plot_spatial_blend.md),
+  [`plot_lisa()`](https://Theayomideo.github.io/matrispace/reference/plot_lisa.md).
+- Local spatial association:
+  [`compute_lisa()`](https://Theayomideo.github.io/matrispace/reference/compute_lisa.md).
+- Global spatial autocorrelation:
+  [`compute_morans_i()`](https://Theayomideo.github.io/matrispace/reference/compute_morans_i.md).
+- Differential expression:
+  - [`find_spatially_corrected_ecm_markers()`](https://Theayomideo.github.io/matrispace/reference/find_spatially_corrected_ecm_markers.md)
+    — within-sample, two-stage Wilcoxon screen followed by a `spaMM`
+    Matérn spatial mixed model.
+  - `find_ecm_de_samples(pseudobulk = TRUE)` — cross-sample pseudobulk
+    testing with `DESeq2`, with optional cluster and blocking
+    adjustment.
+
+## Installation
+
+Requires R (\>= 4.1.0).
+
+``` r
+
+install.packages("pak")
+pak::pak("Theayomideo/matrispace")
+```
+
+## Quick start
+
+``` r
+
+library(matrispace)
+
+seurat_obj <- readRDS("my_visium_data.rds")
+seurat_obj <- prepare_object(seurat_obj)
+seurat_obj <- score_matrisome(seurat_obj)
+seurat_obj <- annotate_ecm_niches(seurat_obj)
+```
+
+See the package vignettes for full differential-expression,
+matrisome-pair co-expression, and spatial-statistics examples.
+
+## See also
+
+- [MatriSpace web
+  app](https://izzilab-matrispace.share.connect.posit.cloud/)
+- [MatriSpace app
+  repository](https://github.com/Theayomideo/matrispace-app)
+- [The Matrisome
+  Project](https://sites.google.com/uic.edu/matrisome/home)
+- [MatriCom](https://github.com/Izzilab/MatriCom)
+
+# Package index
+
+## Package overview
+
+- [`matrispace-package`](https://Theayomideo.github.io/matrispace/reference/matrispace-package.md)
+  [`matrispace`](https://Theayomideo.github.io/matrispace/reference/matrispace-package.md)
+  : matrispace: Identification and Visualization of Spatially-Resolved
+  ECM Gene Expression Patterns
+
+## Preprocessing
+
+- [`prepare_object()`](https://Theayomideo.github.io/matrispace/reference/prepare_object.md)
+  : Prepare Seurat object for matrisome analysis
+- [`convert_spe_to_seurat()`](https://Theayomideo.github.io/matrispace/reference/convert_spe_to_seurat.md)
+  : Convert SpatialExperiment to Seurat object
+- [`translate_signatures()`](https://Theayomideo.github.io/matrispace/reference/translate_signatures.md)
+  : Translate gene signatures using HGNChelper
+
+## Matrisome and ECM niches
+
+- [`score_matrisome()`](https://Theayomideo.github.io/matrispace/reference/score_matrisome.md)
+  : Calculate matrisome feature scores
+- [`annotate_ecm_niches()`](https://Theayomideo.github.io/matrispace/reference/annotate_ecm_niches.md)
+  : Annotate ECM niches using ScType
+- [`compute_expression_metrics()`](https://Theayomideo.github.io/matrispace/reference/compute_expression_metrics.md)
+  : Compute expression metrics for matrisome categories
+
+## Differential expression
+
+- [`find_ecm_markers()`](https://Theayomideo.github.io/matrispace/reference/find_ecm_markers.md)
+  : Find differentially expressed ECM genes between groups
+- [`find_all_ecm_markers()`](https://Theayomideo.github.io/matrispace/reference/find_all_ecm_markers.md)
+  : Find ECM markers for all clusters
+- [`find_spatially_corrected_ecm_markers()`](https://Theayomideo.github.io/matrispace/reference/find_spatially_corrected_ecm_markers.md)
+  : Find spatially corrected ECM markers between two groups
+- [`find_ecm_de_samples()`](https://Theayomideo.github.io/matrispace/reference/find_ecm_de_samples.md)
+  : Differential expression of ECM genes between samples or conditions
+
+## Spatial statistics
+
+- [`compute_lisa()`](https://Theayomideo.github.io/matrispace/reference/compute_lisa.md)
+  : Compute LISA statistics for feature pairs
+- [`compute_morans_i()`](https://Theayomideo.github.io/matrispace/reference/compute_morans_i.md)
+  : Compute Moran's I spatial autocorrelation
+
+## Matrisome-pair co-expression
+
+- [`score_matrisome_pair_coexpression()`](https://Theayomideo.github.io/matrispace/reference/score_matrisome_pair_coexpression.md)
+  : Calculate spatial matrisome-pair co-expression scores
+- [`find_matrisome_pair_enrichment()`](https://Theayomideo.github.io/matrispace/reference/find_matrisome_pair_enrichment.md)
+  : Find enriched matrisome-pair co-expression per group
+- [`aggregate_matrisome_pairs()`](https://Theayomideo.github.io/matrispace/reference/aggregate_matrisome_pairs.md)
+  : Aggregate reciprocal rows into unique matrisome pairs
+
+## Visualization
+
+- [`plot_spatial_feature()`](https://Theayomideo.github.io/matrispace/reference/plot_spatial_feature.md)
+  : Create spatial feature plot
+- [`plot_matrisome()`](https://Theayomideo.github.io/matrispace/reference/plot_matrisome.md)
+  : Create matrisome category spatial plots
+- [`plot_spatial_blend()`](https://Theayomideo.github.io/matrispace/reference/plot_spatial_blend.md)
+  : Create blended spatial plot for two features
+- [`plot_lisa()`](https://Theayomideo.github.io/matrispace/reference/plot_lisa.md)
+  : Create LISA clustering plot
+- [`palette_ecm()`](https://Theayomideo.github.io/matrispace/reference/palette_ecm.md)
+  : Generate ECM niche color palette
+- [`palette_annotation()`](https://Theayomideo.github.io/matrispace/reference/palette_annotation.md)
+  : Generate annotation color palette
+- [`add_scalebar()`](https://Theayomideo.github.io/matrispace/reference/add_scalebar.md)
+  : Add scale bar to spatial plot
+
+## Reference data
+
+- [`matrisome_db`](https://Theayomideo.github.io/matrispace/reference/matrisome_db.md)
+  : Matrisome Gene Database
+- [`matrisome_signatures`](https://Theayomideo.github.io/matrispace/reference/matrisome_signatures.md)
+  : Matrisome UCell Signatures
+- [`ecm_signatures`](https://Theayomideo.github.io/matrispace/reference/ecm_signatures.md)
+  : ECM Niche Signatures
+- [`matrisome_pairs`](https://Theayomideo.github.io/matrispace/reference/matrisome_pairs.md)
+  : MatriComDB Matrisome Pair Database
+- [`ecm_markers`](https://Theayomideo.github.io/matrispace/reference/ecm_markers.md)
+  : ECM Niche Markers
+
+## Deprecated
+
+- [`annotate_ecm_domains()`](https://Theayomideo.github.io/matrispace/reference/annotate_ecm_domains.md)
+  : Annotate ECM domains (deprecated)
+
+# Articles
+
+### All vignettes
+
+- [Getting started with
+  matrispace](https://Theayomideo.github.io/matrispace/articles/getting-started.md):
+- [MatriSpace: Spatially-Resolved ECM Gene Expression
+  Patterns](https://Theayomideo.github.io/matrispace/articles/matrispace-demo.md):
